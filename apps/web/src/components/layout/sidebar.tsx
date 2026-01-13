@@ -12,11 +12,19 @@ import {
   FileText,
   PanelLeftClose,
   PanelLeftOpen,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useSidebar } from './sidebar-provider';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
 
 const navigation = [
   {
@@ -51,26 +59,30 @@ const navigation = [
   },
 ];
 
-export function Sidebar() {
+function SidebarContent({ isMobile }: { isMobile: boolean }) {
   const pathname = usePathname();
-  const { collapsed, toggle } = useSidebar();
+  const { collapsed, toggle, setOpenMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
-    <div
-      className={cn(
-        'fixed left-0 top-8 h-[calc(100%-60px)] flex flex-col border border-l-0 bg-card transition-all duration-300 rounded-r-lg z-10',
-        collapsed ? 'w-16' : 'w-64'
-      )}
-      suppressHydrationWarning
-    >
+    <div className="flex h-full w-full flex-col">
       <div
         className={cn(
           'flex h-16 items-center justify-between border-b min-w-0',
-          collapsed ? 'px-0 justify-center' : 'px-4'
+          collapsed && !isMobile ? 'px-0 justify-center' : 'px-4'
         )}
       >
-        {!collapsed && (
-          <Link href="/dashboard" className="flex items-center min-w-0">
+        {(!collapsed || isMobile) && (
+          <Link
+            href="/dashboard"
+            className="flex items-center min-w-0"
+            onClick={handleLinkClick}
+          >
             <Image
               src="/logo.png"
               alt="Save Our Votes"
@@ -81,26 +93,42 @@ export function Sidebar() {
             />
           </Link>
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggle}
-          className={cn(
-            'h-10 w-10 shrink-0',
-            collapsed ? 'mx-auto' : 'ml-auto'
+        <div className="flex items-center gap-2">
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setOpenMobile(false)}
+              className="h-10 w-10 shrink-0"
+            >
+              <X className="h-5 w-5" />
+            </Button>
           )}
-        >
-          {collapsed ? (
-            <PanelLeftOpen className="h-5 w-5" />
-          ) : (
-            <PanelLeftClose className="h-5 w-5" />
+          {!isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggle}
+              className={cn(
+                'h-10 w-10 shrink-0',
+                collapsed ? 'mx-auto' : 'ml-auto'
+              )}
+            >
+              {collapsed ? (
+                <PanelLeftOpen className="h-5 w-5" />
+              ) : (
+                <PanelLeftClose className="h-5 w-5" />
+              )}
+            </Button>
           )}
-        </Button>
+        </div>
       </div>
       <nav
         className={cn(
           'flex-1 space-y-1',
-          collapsed ? 'pt-4 pb-0 px-0 flex flex-col items-center' : 'p-4'
+          collapsed && !isMobile
+            ? 'pt-4 pb-0 px-0 flex flex-col items-center'
+            : 'p-4'
         )}
       >
         {navigation.map((item) => {
@@ -109,17 +137,22 @@ export function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={handleLinkClick}
               className={cn(
                 'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors min-w-0 h-10',
-                collapsed ? 'w-10 justify-center items-center mx-auto' : 'px-3',
+                collapsed && !isMobile
+                  ? 'w-10 justify-center items-center mx-auto'
+                  : 'px-3',
                 isActive
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
               )}
-              title={collapsed ? item.name : undefined}
+              title={collapsed && !isMobile ? item.name : undefined}
             >
               <item.icon className="h-5 w-5 shrink-0" />
-              {!collapsed && <span className="truncate">{item.name}</span>}
+              {(!collapsed || isMobile) && (
+                <span className="truncate">{item.name}</span>
+              )}
             </Link>
           );
         })}
@@ -127,11 +160,44 @@ export function Sidebar() {
       <div
         className={cn(
           'border-t flex items-center',
-          collapsed ? 'pt-4 pb-4 px-0 justify-center' : 'p-4 justify-start'
+          collapsed && !isMobile
+            ? 'pt-4 pb-4 px-0 justify-center'
+            : 'p-4 justify-start'
         )}
       >
         <ThemeToggle />
       </div>
+    </div>
+  );
+}
+
+export function Sidebar() {
+  const { isMobile, openMobile, setOpenMobile, collapsed } = useSidebar();
+
+  if (isMobile) {
+    return (
+      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
+        <SheetContent side="left" className="w-64 p-0 [&>button]:hidden">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Sidebar</SheetTitle>
+            <SheetDescription>Navigation menu</SheetDescription>
+          </SheetHeader>
+          <SidebarContent isMobile={isMobile} />
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        'fixed left-0 top-8 h-[calc(100%-60px)] flex flex-col border bg-card transition-all duration-300 rounded-r-lg z-10',
+        'hidden md:flex',
+        collapsed ? 'w-16' : 'w-64'
+      )}
+      suppressHydrationWarning
+    >
+      <SidebarContent isMobile={isMobile} />
     </div>
   );
 }

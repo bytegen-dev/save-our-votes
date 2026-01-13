@@ -4,8 +4,11 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { UserMenu } from '@/components/layout/user-menu';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Menu } from 'lucide-react';
 import { api } from '@/lib/api/client';
+import { Button } from '@/components/ui/button';
+import { useSidebar } from './sidebar-provider';
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   session: {
@@ -149,10 +152,20 @@ export function Header({ session }: HeaderProps) {
     ballotId
   );
 
+  const { toggle } = useSidebar();
+
   return (
-    <header className="flex h-16 items-center border-b bg-card">
+    <header className="sticky top-0 z-10 flex h-16 items-center border-b bg-background/20 backdrop-blur-sm">
       <div className="container-max flex w-full items-center justify-between px-6">
         <div className="flex items-center gap-2 min-w-0">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggle}
+            className="mr-2 md:hidden"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
           {breadcrumbs.map((item, index) => (
             <div key={index} className="flex items-center gap-2">
               {index > 0 && (
