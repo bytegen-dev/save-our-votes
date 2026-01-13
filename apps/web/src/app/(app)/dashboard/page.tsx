@@ -37,7 +37,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8 p-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl">Dashboard</h1>
           <p className="text-muted-foreground mt-2">
@@ -52,7 +52,10 @@ export default async function DashboardPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div
+        className="grid gap-4"
+        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}
+      >
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm">Total Elections</CardTitle>

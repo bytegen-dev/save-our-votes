@@ -3,12 +3,13 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { UserMenu } from '@/components/layout/user-menu';
-import { ChevronRight, Menu } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { CgMenuRight } from 'react-icons/cg';
 import { api } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from './sidebar-provider';
-import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   session: {
@@ -155,17 +156,19 @@ export function Header({ session }: HeaderProps) {
   const { toggle } = useSidebar();
 
   return (
-    <header className="sticky top-0 z-10 flex h-16 items-center border-b bg-background/20 backdrop-blur-sm">
+    <header className="sticky top-0 z-10 h-16 flex py-4 items-center border-b bg-background/70 backdrop-blur-sm">
       <div className="container-max flex w-full items-center justify-between px-6">
-        <div className="flex items-center gap-2 min-w-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggle}
-            className="mr-2 md:hidden"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
+        <div className="flex items-center gap-4 min-w-0">
+          <Link href="/dashboard" className="flex items-center shrink-0">
+            <Image
+              src="/logo.png"
+              alt="Save Our Votes"
+              width={120}
+              height={40}
+              className="h-8 w-auto object-contain"
+              priority
+            />
+          </Link>
           {breadcrumbs.map((item, index) => (
             <div key={index} className="flex items-center gap-2">
               {index > 0 && (
@@ -192,6 +195,14 @@ export function Header({ session }: HeaderProps) {
         </div>
         <div className="flex items-center gap-4 min-w-0">
           <UserMenu user={session.user || {}} />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggle}
+            className="md:hidden"
+          >
+            <CgMenuRight className="h-5 w-5" />
+          </Button>
         </div>
       </div>
     </header>

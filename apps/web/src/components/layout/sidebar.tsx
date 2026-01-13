@@ -77,51 +77,30 @@ function SidebarContent({ isMobile }: { isMobile: boolean }) {
           collapsed && !isMobile ? 'px-0 justify-center' : 'px-4'
         )}
       >
-        {(!collapsed || isMobile) && (
-          <Link
-            href="/dashboard"
-            className="flex items-center min-w-0"
-            onClick={handleLinkClick}
+        {!isMobile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggle}
+            className={cn('h-10 w-10 shrink-0', collapsed ? 'mx-auto' : '')}
           >
-            <Image
-              src="/logo.png"
-              alt="Save Our Votes"
-              width={120}
-              height={40}
-              className="h-8 w-auto object-contain"
-              priority
-            />
-          </Link>
+            {collapsed ? (
+              <PanelLeftOpen className="h-5 w-5" />
+            ) : (
+              <PanelLeftClose className="h-5 w-5" />
+            )}
+          </Button>
         )}
-        <div className="flex items-center gap-2">
-          {isMobile && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setOpenMobile(false)}
-              className="h-10 w-10 shrink-0"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          )}
-          {!isMobile && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggle}
-              className={cn(
-                'h-10 w-10 shrink-0',
-                collapsed ? 'mx-auto' : 'ml-auto'
-              )}
-            >
-              {collapsed ? (
-                <PanelLeftOpen className="h-5 w-5" />
-              ) : (
-                <PanelLeftClose className="h-5 w-5" />
-              )}
-            </Button>
-          )}
-        </div>
+        {isMobile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpenMobile(false)}
+            className="h-10 w-10 shrink-0 ml-auto"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        )}
       </div>
       <nav
         className={cn(
@@ -139,12 +118,12 @@ function SidebarContent({ isMobile }: { isMobile: boolean }) {
               href={item.href}
               onClick={handleLinkClick}
               className={cn(
-                'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors min-w-0 h-10',
+                'flex items-center gap-3 rounded-lg text-sm transition-colors min-w-0 h-10',
                 collapsed && !isMobile
                   ? 'w-10 justify-center items-center mx-auto'
                   : 'px-3',
                 isActive
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary font-medium text-primary-foreground'
                   : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
               )}
               title={collapsed && !isMobile ? item.name : undefined}
@@ -177,7 +156,7 @@ export function Sidebar() {
   if (isMobile) {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile}>
-        <SheetContent side="left" className="w-64 p-0 [&>button]:hidden">
+        <SheetContent side="right" className="w-64 p-0 [&>button]:hidden">
           <SheetHeader className="sr-only">
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Navigation menu</SheetDescription>
