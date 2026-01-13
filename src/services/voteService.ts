@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import VoterToken, { IVoterToken } from '../model/voterTokenModel.js';
-import Ballot from '../model/ballotModel.js';
+import Election from '../model/electionModel.js';
 import { IBallot } from '../Interfaces/electionInterface.js';
 import Vote from '../model/voteModel.js';
 import { RuleRegistry } from '../domain/voting/rules.js';
@@ -56,7 +56,7 @@ export async function castVote({
 
   // Atomically mark token used to prevent double-vote
   const consumed = await VoterToken.findOneAndUpdate(
-    { election: electionId, tokenHash, used: false },
+    { electionId: electionId, tokenHash, used: false },
     { $set: { used: true, usedAt: new Date() } },
     { new: true }
   );
@@ -64,9 +64,13 @@ export async function castVote({
     throw new Error('Invalid or already used token');
   }
 
-  // Load ballot and validate selection via rule
-  const ballot = (await Ballot.findById(ballotId).lean()) as any;
-  if (!ballot || String(ballot.election) !== String(electionId)) {
+  // Load election and find ballot
+  const election = await Election.findById(electionId).lean();
+  if (!election) {
+    throw new Error('Election not found');
+  }
+  const ballot = election.ballots.find((b) => String(b._id) === String(ballotId));
+  if (!ballot) {
     throw new Error('Ballot not found for this election');
   }
   const rule = RuleRegistry[ballot.type];
@@ -110,11 +114,16 @@ export async function castVotesForElection({
     throw new Error('Token has expired');
   }
 
-  // Validate all ballots and options before consuming token
+  // Load election and validate all ballots and options before consuming token
+  const election = await Election.findById(electionId).lean();
+  if (!election) {
+    throw new Error('Election not found');
+  }
+  
   const validatedBallots = [];
   for (const { ballotId, optionIds } of ballots) {
-    const ballot = (await Ballot.findById(ballotId).lean()) as any;
-    if (!ballot || String(ballot.election) !== String(electionId)) {
+    const ballot = election.ballots.find((b) => String(b._id) === String(ballotId));
+    if (!ballot) {
       throw new Error(`Ballot ${ballotId} not found for this election`);
     }
     const rule = RuleRegistry[ballot.type];
@@ -125,7 +134,7 @@ export async function castVotesForElection({
 
   // Atomically consume token and record all votes
   const consumed = await VoterToken.findOneAndUpdate(
-    { election: electionId, tokenHash, used: false },
+    { electionId: electionId, tokenHash, used: false },
     { $set: { used: true, usedAt: new Date() } },
     { new: true }
   );

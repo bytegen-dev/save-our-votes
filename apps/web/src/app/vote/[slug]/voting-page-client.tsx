@@ -74,23 +74,24 @@ export function VotingPageClient({ election }: VotingPageClientProps) {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4"
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6"
       style={{
         backgroundColor: primaryColor,
         color: secondaryColor,
       }}
     >
       <Card 
-        className="w-full max-w-md"
+        className="w-full max-w-md shadow-2xl"
         style={{
           backgroundColor: secondaryColor,
           color: primaryColor,
           borderColor: primaryColor,
+          borderWidth: '2px',
         }}
       >
-        <CardHeader className="text-center">
+        <CardHeader className="text-center pb-6">
           {logo && (
-            <div className="relative w-20 h-20 mx-auto mb-4">
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-6">
               <Image
                 src={logo}
                 alt="Election logo"
@@ -100,25 +101,26 @@ export function VotingPageClient({ election }: VotingPageClientProps) {
             </div>
           )}
           <CardTitle 
-            className="text-2xl"
+            className="text-2xl sm:text-3xl font-semibold mb-3"
             style={{ color: primaryColor }}
           >
             {election.title}
           </CardTitle>
           {election.description && (
             <CardDescription 
-              className="mt-2"
-              style={{ color: primaryColor, opacity: 0.8 }}
+              className="text-sm sm:text-base leading-relaxed"
+              style={{ color: primaryColor, opacity: 0.85 }}
             >
               {election.description}
             </CardDescription>
           )}
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleTokenSubmit} className="space-y-4">
-            <div className="space-y-2">
+        <CardContent className="space-y-6">
+          <form onSubmit={handleTokenSubmit} className="space-y-5">
+            <div className="space-y-3">
               <Label 
                 htmlFor="token"
+                className="text-sm font-medium"
                 style={{ color: primaryColor }}
               >
                 Voter Token
@@ -131,14 +133,16 @@ export function VotingPageClient({ election }: VotingPageClientProps) {
                 onChange={(e) => setToken(e.target.value)}
                 disabled={isValidating}
                 autoFocus
+                className="h-12 text-base"
                 style={{
                   backgroundColor: 'white',
                   color: '#000000',
+                  borderWidth: '2px',
                 }}
               />
               <p 
-                className="text-xs"
-                style={{ color: primaryColor, opacity: 0.7 }}
+                className="text-xs sm:text-sm"
+                style={{ color: primaryColor, opacity: 0.75 }}
               >
                 Enter the token provided to you to access this election.
               </p>
@@ -153,7 +157,7 @@ export function VotingPageClient({ election }: VotingPageClientProps) {
 
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full h-12 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow" 
               disabled={isValidating}
               style={{
                 backgroundColor: primaryColor,
@@ -162,7 +166,7 @@ export function VotingPageClient({ election }: VotingPageClientProps) {
             >
               {isValidating ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Validating...
                 </>
               ) : (
